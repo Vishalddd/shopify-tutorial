@@ -1,0 +1,200 @@
+{% assign announce_rgb = announce_hex | remove: '#' | downcase | split: '' %}
+{% assign announce_str = '' %}
+{% assign announce_chars = 'a,b,c,d,e,f' | split: ',' %}
+{% assign announce_remainders = '10,11,12,13,14,15' | split: ',' %}
+{% for announce_i in (0..5) %}
+    {% assign announce_is_char = 0 %}
+    {% for announce_c in (0..5) %}
+        {% unless announce_is_char == 1 %}
+            {% if announce_rgb[announce_i] == announce_chars[announce_c] %}
+                {% assign announce_is_char = 1 %}
+                {% capture announce_str %}{{ announce_str }}{{ announce_remainders[announce_c] }}|{% endcapture %}
+            {% endif %}
+        {% endunless %}
+    {% endfor %}    
+    {% if announce_is_char == 0 %}
+        {% capture announce_str %}{{ announce_str }}{{ announce_rgb[announce_i] }}|{% endcapture %}
+    {% endif %}
+{% endfor %}
+{% assign announce_rgb = announce_str | split: "|" %}
+{% assign announce_r = announce_rgb[0] | times: 16 | plus: announce_rgb[1] %}
+{% assign announce_g = announce_rgb[2] | times: 16 | plus: announce_rgb[3] %}
+{% assign announce_b = announce_rgb[4] | times: 16 | plus: announce_rgb[5] %}
+<head>
+    {% if template == "index" %} 
+      {{ 'your-announce-bar.css' | asset_url | stylesheet_tag }}
+      {{ 'animations.css' | asset_url | stylesheet_tag }}
+    {% endif %}
+  </head>
+  {% assign announce_hex = section.settings.background_color %}
+{% if block.settings.announce_enable != false %} 
+    <div class="your-announce {{ block.settings.animation }}"style="background: rgb({{ announce_r }}, {{ announce_g }}, {{ announce_b }}, 0.{{ block.settings.opacity }});color:{{ block.settings.font_color }};">
+      <html lang="en">
+<head>
+</head>
+      <body>  
+        <div class="container">
+            <div class="no-box">
+            </div>
+            <button class="btn" onclick="prev()"> &#8592 </button>
+            <span class="str">
+            {% if block.settings.link != blank %}<a href="{{block.settings.link | escape }}"style="color:{{ block.settings.font_color }};">{% endif %}
+              {{ block.settings.message }}
+            {% if block.settings.link != blank %}</a>{% endif %}
+            <button class="btn" onclick="next()"> &#8594 </button>
+          </div>
+    </div>
+    {%- if section.settings.blog_show_previous_and_next_buttons -%}
+    <ul>
+        <li>
+            <a href="{{ blog.previous_article }}">Previous post</a>
+        </li>
+        <li>
+            <a href="{{ blog.next_article }}">Next post</a>
+        </li>
+    </ul>
+    {%- endif -%}
+{% endif %}
+<script>
+  var no_box = document
+      .querySelector('.no-box');
+  var a = {{ block.settings.message }};
+  function prev() {
+      if (a == string ) {
+          document.getElementsByClassName( 'prev' ).disabled = true;
+          document.getElementsByClassName( 'next' ).disabled = false;
+      } else {
+          i--;
+          return setNo();
+      }
+  }
+  function next() {
+      if (a == string ) {
+          document.getElementsByClassName( 'next' ).disabled = true;
+          document.getElementsByClassName( 'prev' ).disabled = false;
+      } else {
+          i++;
+          return setNo();
+      }
+  }
+  function setNo() {
+      return no_box.innerHTML = i;
+  }
+  /* for arrow disable and enable */
+  let input = document.querySelector("#input");
+  let button = document.querySelector("#button");
+
+    button.disabled = true;
+
+    const event = new Event("change");
+    input.addEventListener("change", stateHandle);
+
+    function stateHandle() {
+        var t = document.getElementById("jarak").value,
+        check = "luar";
+        if (new RegExp('\\b' + check + '\\b').test(t)) {
+        button.disabled = true;
+        } else {
+        button.disabled = false;
+        }
+    }
+setTimeout(function() {
+    input.dispatchEvent(event);
+}, 700);
+</script>
+</body>
+</html>
+{% schema %}
+  {
+    "name": "Announcement Here",
+    "target": "section",
+    "class": "index-section",
+    "settings": [
+      {
+       "type": "header",
+       "content": "General"
+      },
+      {
+        "type": "checkbox",
+        "id": "announce_enable",
+        "label": "Show Announce",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "message",
+        "label": "Message",
+        "default": "Title for Announcemant"
+      },
+      {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+      }, 
+      {
+        "type": "color",
+        "id": "background-color",
+        "label": "Background color",
+        "default": "#000000"
+      }, 
+      {
+            "type": "color",
+            "id": "font_color",
+            "label": "Font Color",
+        	  "default": "#fff"
+      }, 
+      {
+          "type":      "range",
+          "id":        "opacity",
+          "min":       0,
+          "max":        95,
+          "step":       5,
+          "unit":       "%",
+          "label":     "Bar Opacity",
+          "default":   85
+      },
+      {
+         "type": "select",
+         "id": "animation",
+         "options": [
+            { "value": "no_animation", "label": "None"},
+            { "value": "slideUp", "label": "Slide Up"},
+            { "value": "slideDown", "label": "Slide Down"},
+            { "value": "slideLeft", "label": "Slide Left"},
+            { "value": "slideRight", "label": "Slide Right"},
+            { "value": "slideExpandUp", "label": "Slide Expand Up"},
+            { "value": "expandUp", "label": "Expand Up"},
+            { "value": "fadeIn", "label": "Fade In"},
+            { "value": "expandOpen", "label": "Expand Open"},
+            { "value": "bigEntrance", "label": "Big Entrance"},
+            { "value": "hatch", "label": "Hatch"},
+            { "value": "bounce", "label": "Bounce"},
+            { "value": "pulse", "label": "Pulse"},
+            { "value": "float", "label": "Float"},
+            { "value": "tossing", "label": "Tossing"},
+            { "value": "pullUp", "label": "Pull Up"},
+            { "value": "pullDown", "label": "Pull Down"},
+            { "value": "stretchLeft", "label": "Stretch Left"},
+            { "value": "stretchRight", "label": "Stretch Right"}
+         ],
+         "label": "Animation Type"
+      },
+      {
+        "type": "range",
+        "id": "announcement_padding",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding For Bar",
+        "default": 5
+    },
+    {
+        "type": "checkbox",
+        "id": "blog_show_previous_and_next_buttons",
+        "label": "Show next/ previous buttons",
+        "default": true
+    }
+    ]
+  }
+{% endschema %}
